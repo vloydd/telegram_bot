@@ -1,0 +1,5 @@
+name: Telegram Bot
+type: module
+description: Provides Integration with Bahrain Airport Site
+core_version_requirement: 9.x
+package: Custom

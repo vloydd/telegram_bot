@@ -1,0 +1,23 @@
+{
+    "name": "vloydd/telegram_bot",
+    "type": "project",
+    "description": "Drupal's PHP Telegram to Integrate With a Website",
+    "keywords": ["telegram", "bot", "bahrain"],
+    "license": "MIT",
+    "homepage": "https://github.com/vloydd/telegram_bot",
+    "authors": [
+        {
+            "name": "vloydd",
+            "homepage": "https://github.com/vloydd",
+            "role": "Developer"
+        },
+        {
+            "name": "Hajime",
+            "homepage": "https://github.com/HajimeGit",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "longman/telegram-bot": "*"
+    }
+}

@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Taxi module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function telegram_bot_uninstall() {
+  \Drupal::configFactory()->getEditable('telegram_bot.setting')->delete();
+}
