@@ -40,7 +40,7 @@ class ExchangeCommand extends UserCommand {
    *
    * @var string
    */
-  protected $version = '1.0.0';
+  protected $version = '1.0.1';
 
   /**
    * We point do not use the databases.
@@ -152,7 +152,8 @@ class ExchangeCommand extends UserCommand {
       case 3:
         $this->conversation->update();
         $currency_to = $notes['currency_to'];
-        $currency_request = file_get_contents("https://api.currencyapi.com/v3/latest?apikey=wD9Y8LhiZrz7bLwOcD5YUegdQGZKzT7g5gAgxmZp&currencies={$notes['currency_to']}&base_currency={$notes['currency_from']}");
+        $api_key = \Drupal::config('telegram_bot.settings')->get('currency_api');
+        $currency_request = file_get_contents("https://api.currencyapi.com/v3/latest?apikey={$api_key}&currencies={$notes['currency_to']}&base_currency={$notes['currency_from']}");
         $response_array = json_decode($currency_request);
         $currency_ratio = $response_array->data->$currency_to->value;
         $result_sum = $currency_ratio * $notes['sum'];

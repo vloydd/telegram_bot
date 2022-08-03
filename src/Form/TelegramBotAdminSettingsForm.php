@@ -2,10 +2,8 @@
 
 namespace Drupal\telegram_bot\Form;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\telegram_bot\Service\TelegramBotManagerInterface;
 use Longman\TelegramBot\Exception\TelegramException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -22,26 +20,20 @@ class TelegramBotAdminSettingsForm extends ConfigFormBase {
   protected $telegramBotManager;
 
   /**
-   * Constructor for an Our Form.
+   * Config Object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The Factory for Configuration Objects.
-   * @param \Drupal\telegram_bot\Service\TelegramBotManagerInterface $telegram_bot_manager
-   *   Our Telegram Bot Manager.
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TelegramBotManagerInterface $telegram_bot_manager) {
-    parent::__construct($config_factory);
-    $this->telegramBotManager = $telegram_bot_manager;
-  }
+  protected $configFactory;
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('telegram_bot.manager')
-    );
+    $instance = parent::create($container);
+    $instance->telegramBotManager = $container->get('telegram_bot.manager');
+    $instance->configFactory = $container->get('config.factory');
+    return $instance;
   }
 
   /**
@@ -62,8 +54,8 @@ class TelegramBotAdminSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    // Get Our Configs.
-    $config = $this->config('telegram_bot.settings');
+    // Get our configs.
+    $config = $this->configFactory->get('telegram_bot.settings');
 
     $form['config'] = [
       '#type' => 'details',
@@ -76,12 +68,17 @@ class TelegramBotAdminSettingsForm extends ConfigFormBase {
       '#required' => TRUE,
       '#title' => $this->t('Telegram Bot Username'),
     ];
-
     $form['config']['telegram_bot_token'] = [
       '#type' => 'textfield',
       '#default_value' => $config->get('token'),
       '#required' => TRUE,
       '#title' => $this->t('Telegram Bot Token'),
+    ];
+    $form['config']['telegram_bot_admin'] = [
+      '#type' => 'textfield',
+      '#default_value' => $config->get('admin_id'),
+      '#required' => FALSE,
+      '#title' => $this->t('Telegram Bot Admin'),
     ];
     // Set Webhook Input.
     $form['config']['set_webhook'] = [
@@ -122,6 +119,31 @@ class TelegramBotAdminSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Password'),
       '#default_value' => $config->get('database_pass'),
     ];
+    $form['config']['openweather'] = [
+      '#type' => 'details',
+      '#title' => $this->t('OpenWeather Settings'),
+      '#open' => FALSE,
+    ];
+    $form['config']['openweather']['openweather_api'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('API Key'),
+      '#default_value' => $config->get('openweather_api'),
+    ];
+    $form['config']['openweather']['openweather_city'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Your Preferred City'),
+      '#default_value' => $config->get('openweather_city'),
+    ];
+    $form['config']['currency'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Currency Data Settings'),
+      '#open' => FALSE,
+    ];
+    $form['config']['currency']['currency_api'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('API Key'),
+      '#default_value' => $config->get('currency_api'),
+    ];
     return parent::buildForm($form, $form_state);
   }
 
@@ -130,7 +152,12 @@ class TelegramBotAdminSettingsForm extends ConfigFormBase {
    */
   public function setWebhook(): void {
     try {
+      $config = $this->config('telegram_bot.settings');
       $this->telegramBotManager->setWebhook();
+      // Notifying admin that webhook was set.
+      $message = 'The Webhook Was Set on ' . \Drupal::request()
+        ->getSchemeAndHttpHost() . '/webhook';
+      $this->telegramBotManager->sendMessage($message, $config->get('admin_id'));
       $this->messenger()->addStatus($this->t('Webhook was Set!'));
     }
     catch (TelegramException $e) {
@@ -143,26 +170,36 @@ class TelegramBotAdminSettingsForm extends ConfigFormBase {
    */
   public function deleteWebhook(): void {
     try {
+      $config = $this->config('telegram_bot.settings');
       $this->telegramBotManager->deleteWebhook();
+      $message = 'The Webhook Was Deleted from ' . \Drupal::request()
+        ->getSchemeAndHttpHost();
+      // Notifying admin that webhook was removed.
+      $this->telegramBotManager->sendMessage($message, $config->get('admin_id'));
       $this->messenger()->addStatus($this->t('Webhook was Deleted!'));
     }
     catch (TelegramException $e) {
       $this->messenger()->addError($e->getMessage());
     }
+
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // Get Form Values And Seve it as Config.
+    // Get form values and save it as config.
     $this->config('telegram_bot.settings')
       ->set('name', $form_state->getValue('telegram_bot_name'))
       ->set('token', $form_state->getValue('telegram_bot_token'))
+      ->set('admin_id', $form_state->getValue('telegram_bot_admin'))
       ->set('database_host', $form_state->getValue('host'))
       ->set('database_name', $form_state->getValue('name'))
       ->set('database_user', $form_state->getValue('user'))
       ->set('database_pass', $form_state->getValue('pass'))
+      ->set('openweather_api', $form_state->getValue('openweather_api'))
+      ->set('openweather_city', $form_state->getValue('openweather_city'))
+      ->set('currency_api', $form_state->getValue('currency_api'))
       ->save();
     parent::submitForm($form, $form_state);
   }

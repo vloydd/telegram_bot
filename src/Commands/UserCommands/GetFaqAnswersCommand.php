@@ -56,7 +56,7 @@ class GetFaqAnswersCommand extends UserCommand {
    *
    * @throws \Longman\TelegramBot\Exception\TelegramException
    */
-  public function execute() :ServerResponse {
+  public function execute():ServerResponse {
     $callback_query = $this->getCallbackQuery();
     $callback_data  = $callback_query->getData();
     $data = [

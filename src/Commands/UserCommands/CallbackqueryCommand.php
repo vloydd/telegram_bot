@@ -4,6 +4,7 @@ namespace Drupal\telegram_bot\Commands\UserCommands;
 
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Request;
 
 /**
  * Class for Handling Callbacks.
@@ -31,7 +32,7 @@ class CallbackqueryCommand extends SystemCommand {
    * @var string
    *   This is Version of Command.
    */
-  protected $version = '1.2.0';
+  protected $version = '1.0.1';
 
   /**
    * Main command execution.
@@ -55,7 +56,7 @@ class CallbackqueryCommand extends SystemCommand {
     elseif (strpos($callback_data, 'faq_verse') === 0) {
       return $this->telegram->executeCommand('getfaqanswers');
     }
-    return TRUE;
+    return Request::emptyResponse();
   }
 
 }

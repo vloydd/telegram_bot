@@ -12,4 +12,13 @@ telegram_bot.admin_settings_form:
     _form: '\Drupal\telegram_bot\Form\TelegramBotAdminSettingsForm'
     _title: 'Telegram Bot'
   requirements:
-    _permission: 'administer contents'
+    _permission: 'administer content'
+
+telegram_bot.login:
+  path: '/telegram/login'
+  defaults:
+    _controller: '\Drupal\telegram_bot\Controller\TelegramController::userLogin'
+    _title: 'Telegram Login'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+#    _custom_access: '\Drupal\telegram_bot\Controller\TelegramController::loginAccess'

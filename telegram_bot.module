@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Contains telegram_bot.module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_entity_insert().
+ *
+ * @throws \Drupal\Core\Entity\EntityMalformedException
+ */
+function telegram_bot_entity_insert(EntityInterface $entity) {
+  // Sending notification message to entity creator.
+  $bundle = $entity->bundle();
+  $type = $entity->getEntityTypeId();
+  // Working with comment, node, webform_submission.
+  if (in_array($type, ['comment', 'node', 'webform_submission'])) {
+    $author = $entity->getOwner();
+    if ($author->hasField('field_telegram_id') && !empty($author->get('field_telegram_id')->value)) {
+      // Getting telegram UID value.
+      $telegram_id = $author->get('field_telegram_id')->value;
+      $sitename = \Drupal::config('system.site')->get('name');
+      // Stores link to entity.
+      $link = '';
+      if ($bundle == 'comment') {
+        $link = $entity->permalink();
+      }
+      else {
+        $link = $entity->toUrl();
+      }
+      $link = $link
+        ->setOption('absolute', TRUE)
+        ->toString();
+      // Forming up a message.
+      $message = 'You added NEW ' . ucwords($bundle) . ' on ' . $sitename . PHP_EOL . $link;
+      $telegram = \Drupal::service('telegram_bot.manager')
+        ->sendMessage($message, $telegram_id);
+    }
+  }
+}

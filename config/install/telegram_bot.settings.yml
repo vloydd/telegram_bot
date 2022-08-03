@@ -1,0 +1,10 @@
+name: cheef_taxi_bot
+token: ''
+database_host: db
+database_name: telegram
+database_user: telegram
+database_pass: telegram
+admin_id: ''
+openweather_api: ''
+openweather_city: ''
+currency_api: ''

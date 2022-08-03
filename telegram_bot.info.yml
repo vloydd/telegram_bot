@@ -3,3 +3,4 @@ type: module
 description: Provides Integration with Bahrain Airport Site
 core_version_requirement: 9.x
 package: Custom
+configure: telegram_bot.admin_settings_form

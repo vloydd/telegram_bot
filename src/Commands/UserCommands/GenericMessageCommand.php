@@ -3,6 +3,7 @@
 namespace Drupal\telegram_bot\Commands\UserCommands;
 
 use Longman\TelegramBot\Commands\SystemCommand;
+use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\ServerResponse;
 
@@ -45,6 +46,7 @@ class GenericMessageCommand extends SystemCommand {
     }
     $message = $this->getMessage();
     // Handle any kind of message here.
+    $type = $message->getType();
     $message_text = strtolower($message->getText(TRUE));
 
     switch ($message_text) {
@@ -67,6 +69,7 @@ class GenericMessageCommand extends SystemCommand {
       case 'main page':
         $message_text = 'start';
         break;
+
     }
     return $this->getTelegram()->executeCommand($message_text);
   }

@@ -1,4 +1,13 @@
 services:
   telegram_bot.manager:
     class: Drupal\telegram_bot\Service\TelegramBotManager
-    arguments: ['@config.factory']
+    arguments: ['@config.factory', '@logger.factory']
+  telegram_bot.openweather:
+    class: Drupal\telegram_bot\Service\OpenWeather
+    arguments: ['@http_client', '@logger.factory', '@config.factory']
+  logger.channel.telegram_bot:
+    parent: logger.channel_base
+    arguments: ['telegram_bot']
+  logger.channel.openweather:
+    parent: logger.channel_base
+    arguments: ['openweather']
