@@ -77,8 +77,8 @@ class MeInfoCommand extends UserCommand {
     $caption = t('Your Id: @id; Name: @name; Username: @username',
       [
         '@id' => $user_id,
-        '@name' => $from->getFirstName(),
-        '@username' => $from->getUsername(),
+        '@name' => $from->getFirstName() . $from->getLastName(),
+        '@username' => '@' . $from->getUsername(),
       ]);
 
     // Fetch last profile picture.

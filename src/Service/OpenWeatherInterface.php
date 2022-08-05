@@ -5,6 +5,8 @@ namespace Drupal\telegram_bot\Service;
 /**
  * This is OpenWeather Interface.
  *
+ * @link https://openweathermap.org/api
+ *
  * @package Drupal\telegram_bot\Services
  */
 interface OpenWeatherInterface {

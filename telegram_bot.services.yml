@@ -5,9 +5,15 @@ services:
   telegram_bot.openweather:
     class: Drupal\telegram_bot\Service\OpenWeather
     arguments: ['@http_client', '@logger.factory', '@config.factory']
+  telegram_bot.words:
+    class: Drupal\telegram_bot\Service\Words
+    arguments: ['@http_client', '@logger.factory', '@config.factory' ]
   logger.channel.telegram_bot:
     parent: logger.channel_base
     arguments: ['telegram_bot']
   logger.channel.openweather:
     parent: logger.channel_base
     arguments: ['openweather']
+  logger.channel.words:
+    parent: logger.channel_base
+    arguments: [ 'words' ]

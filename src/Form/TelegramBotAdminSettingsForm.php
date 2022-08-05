@@ -144,6 +144,16 @@ class TelegramBotAdminSettingsForm extends ConfigFormBase {
       '#title' => $this->t('API Key'),
       '#default_value' => $config->get('currency_api'),
     ];
+    $form['config']['words'] = [
+      '#type' => 'details',
+      '#title' => $this->t('WordsAPI Settings'),
+      '#open' => FALSE,
+    ];
+    $form['config']['words']['words_api'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('API Key'),
+      '#default_value' => $config->get('words_api'),
+    ];
     return parent::buildForm($form, $form_state);
   }
 
@@ -200,6 +210,7 @@ class TelegramBotAdminSettingsForm extends ConfigFormBase {
       ->set('openweather_api', $form_state->getValue('openweather_api'))
       ->set('openweather_city', $form_state->getValue('openweather_city'))
       ->set('currency_api', $form_state->getValue('currency_api'))
+      ->set('words_api', $form_state->getValue('words_api'))
       ->save();
     parent::submitForm($form, $form_state);
   }

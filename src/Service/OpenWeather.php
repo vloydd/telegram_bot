@@ -10,6 +10,8 @@ use GuzzleHttp\ClientInterface;
 /**
  * Class for OpenWeather.
  *
+ * @link https://openweathermap.org/api
+ *
  * @package Drupal\telegram_bot\Services
  */
 class OpenWeather implements OpenWeatherInterface {
@@ -160,7 +162,6 @@ class OpenWeather implements OpenWeatherInterface {
       try {
         $response = $this->httpClient
           ->request('get', 'https://api.openweathermap.org/data/2.5/forecast?q=' . $name . '&units=metric&appid=' . $api_key);
-        // ->request('get', 'https://api.openweathermap.org/data/2.5/weather?q='. $name . '&units=metric&appid=' . $api_key);
         $code = $response->getStatusCode();
         if ($code == 200) {
           $result = JSON::decode($response->getBody());
@@ -204,7 +205,6 @@ class OpenWeather implements OpenWeatherInterface {
       try {
         $response = $this->httpClient
           ->request('get', 'https://api.openweathermap.org/data/2.5/forecast?lat=' . $latitude . '&lon=' . $longitude . '&units=metric&appid=' . $api_key);
-        // ->request('get', 'https://api.openweathermap.org/data/2.5/weather?lat=' . $latitude . '&lon='. $longitude . '&units=metric&appid=' . $api_key);
         $code = $response->getStatusCode();
         if ($code == 200) {
           $result = JSON::decode($response->getBody());

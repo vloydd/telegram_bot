@@ -23,13 +23,19 @@ use Drupal\telegram_bot\Commands\UserCommands\StartCommand;
 use Drupal\telegram_bot\Commands\UserCommands\GetFaqAnswersCommand;
 use Drupal\telegram_bot\Commands\UserCommands\GetFaqQuestionsCommand;
 use Drupal\telegram_bot\Commands\UserCommands\WeatherCommand;
+use Drupal\telegram_bot\Commands\UserCommands\WordsCommand;
 use Drupal\user\UserInterface;
+use Drupal\telegram_bot\Commands\UserCommands\InlineQueryCommand;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\Request;
 
 /**
  * This is Our TelegramBotManager, It's Heart.
+ *
+ * @link https://core.telegram.org/bots/api
+ *
+ * @package Drupal\telegram_bot\Services
  */
 class TelegramBotManager implements TelegramBotManagerInterface {
 
@@ -197,6 +203,8 @@ class TelegramBotManager implements TelegramBotManagerInterface {
       CourseCommand::class,
       ForecastCommand::class,
       MeInfoCommand::class,
+      InlinequeryCommand::class,
+      WordsCommand::class,
     ]);
     // Enabling Telegram admin for features.
     if (!empty($this->admin)) {
@@ -237,7 +245,7 @@ class TelegramBotManager implements TelegramBotManagerInterface {
       $site_url = \Drupal::request()->getSchemeAndHttpHost();
     }
     $site_url = $site_url . '/webhook';
-    $telegram->setWebhook($site_url);
+    $telegram->setWebhook($site_url, ['drop_pending_updates' => TRUE]);
   }
 
   /**

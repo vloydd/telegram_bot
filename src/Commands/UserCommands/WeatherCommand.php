@@ -41,7 +41,7 @@ class WeatherCommand extends UserCommand {
    *
    * @var string
    */
-  protected $version = '1.0.0';
+  protected $version = '1.0.1';
 
   /**
    * Usage of SQL Is that what We Need.
@@ -125,6 +125,7 @@ class WeatherCommand extends UserCommand {
             $this->conversation->update();
             $this->buildCurrencyKeyboard($this->formMessagefromRequest($weather), 3);
             $this->conversation->stop();
+            $this->sendLocation($chat_id, $weather);
           }
           else {
             $this->buildCurrencyKeyboard("Sorry, Something Went Wrong, Please, Check That Command is Correct(", 1);
@@ -157,12 +158,14 @@ class WeatherCommand extends UserCommand {
                 $this->conversation->update();
                 $this->buildCurrencyKeyboard($this->formMessagefromRequest($weather), 3);
                 $this->conversation->stop();
+                $this->sendLocation($chat_id, $weather);
               }
               else {
                 $this->conversation->stop();
                 $this->buildCurrencyKeyboard("Sorry, Something Went Wrong, Please, Check if You Set Up the City in Your Form(", 1);
               }
               break;
+
             case 'City':
               $notes['state'] = 2.2;
               $notes['type'] = 'City';
@@ -193,15 +196,19 @@ class WeatherCommand extends UserCommand {
           $location = [];
           $location['lat'] = $loc->getLatitude();
           $location['lon'] = $loc->getLongitude();
-          $weather = \Drupal::service('telegram_bot.openweather')->getWeatherByCoord($location['lat'], $location['lon']);
+          $weather = \Drupal::service('telegram_bot.openweather')
+            ->getWeatherByCoord($location['lat'], $location['lon']);
           if ($weather) {
             $this->conversation->stop();
-            $this->buildCurrencyKeyboard($this->formMessagefromRequest($weather), 3);
+            $this
+              ->buildCurrencyKeyboard($this->formMessagefromRequest($weather), 3);
+            $this->sendLocation($chat_id, $weather);
             break;
           }
           else {
             $this->conversation->stop();
-            $this->buildCurrencyKeyboard("Sorry, Something Went Wrong, Please, Check That Command is Correct(", 5);
+            $this
+              ->buildCurrencyKeyboard("Sorry, Something Went Wrong, Please, Check That Command is Correct(", 5);
             break;
           }
         }
@@ -218,6 +225,7 @@ class WeatherCommand extends UserCommand {
         if ($weather) {
           $this->conversation->stop();
           $this->buildCurrencyKeyboard($this->formMessagefromRequest($weather), 3);
+          $this->sendLocation($chat_id, $weather);
           break;
         }
         else {
@@ -229,7 +237,8 @@ class WeatherCommand extends UserCommand {
         $text = trim($message->getText(TRUE));
         $coord = explode(", ", $text);
         try {
-          $weather = \Drupal::service('telegram_bot.openweather')->getWeatherByCoord($coord[0], $coord[1]);
+          $weather = \Drupal::service('telegram_bot.openweather')
+            ->getWeatherByCoord($coord[0], $coord[1]);
         }
         catch (TelegramException $e) {
           $this->buildCurrencyKeyboard("Sorry, Something Wnt Wrong, Please, Check That Your Coordinates is Correct(", 4);
@@ -244,6 +253,7 @@ class WeatherCommand extends UserCommand {
         if ($weather) {
           $this->conversation->stop();
           $this->buildCurrencyKeyboard($this->formMessagefromRequest($weather), 4);
+          $this->sendLocation($chat_id, $weather);
         }
         else {
           $this->buildCurrencyKeyboard("Sorry, Something Went Wrong, Please, Check That Your Coordinates is Correct(", 5);
@@ -256,6 +266,26 @@ class WeatherCommand extends UserCommand {
         return $result;
     }
     return $result;
+  }
+
+  /**
+   * Sends a Message with Location.
+   *
+   * @param string $chat_id
+   *   Basically, Chat ID.
+   * @param array $weather
+   *   Weather Date to Get a Location.
+   *
+   * @return \Longman\TelegramBot\Entities\ServerResponse
+   *   Server Response Object.
+   */
+  public function sendLocation(string $chat_id, array $weather):ServerResponse {
+    return Request::sendLocation(
+      [
+        'chat_id' => $chat_id,
+        'latitude' => $weather['coord']['lat'],
+        'longitude' => $weather['coord']['lon'],
+      ]);
   }
 
   /**
